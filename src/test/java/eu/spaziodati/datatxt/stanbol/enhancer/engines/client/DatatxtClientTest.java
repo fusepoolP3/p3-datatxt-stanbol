@@ -1,11 +1,10 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.client;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.client;
 
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.TestUtils;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.TestUtils;
 import junit.framework.Assert;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.junit.Test;
 
-import java.net.URI;
 import java.util.*;
 
 public class DatatxtClientTest {

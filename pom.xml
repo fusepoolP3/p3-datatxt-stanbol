@@ -22,7 +22,7 @@
 
         <vendor>SpazioDati</vendor>
         <bundle.name>dataTXT NEX</bundle.name>
-        <bundle.symbolicname>eu.spaziodati.datatxt.nex</bundle.symbolicname>
+        <bundle.symbolicname>eu.spaziodati.datatxt.stanbol.enhancer.engines.datatxtnex</bundle.symbolicname>
 
     </properties>
 
@@ -42,7 +42,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            eu.spaziodati.datatxt.stanbol.engine.enhancer.*;version=${project.version}
+                            eu.spaziodati.datatxt.stanbol.enhancer.engines*;version=${project.version}
                         </Export-Package>
 
                         <Embed-Dependency>*;scope=!(provided|test)</Embed-Dependency>

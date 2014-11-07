@@ -1,4 +1,4 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;

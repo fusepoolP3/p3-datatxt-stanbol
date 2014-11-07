@@ -1,4 +1,4 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;

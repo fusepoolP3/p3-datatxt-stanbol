@@ -1,4 +1,4 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.client;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.client;
 
 import com.google.gson.annotations.SerializedName;
 

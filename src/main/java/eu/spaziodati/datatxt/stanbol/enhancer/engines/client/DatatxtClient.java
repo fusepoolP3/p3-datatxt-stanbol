@@ -1,7 +1,7 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.client;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.client;
 
 import com.google.gson.GsonBuilder;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.DatatxtProperties;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtProperties;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;

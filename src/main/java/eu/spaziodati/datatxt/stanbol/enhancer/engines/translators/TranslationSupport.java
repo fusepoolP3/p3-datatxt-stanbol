@@ -1,6 +1,6 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.translators;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtResponse;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.Language;
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
@@ -8,7 +8,6 @@ import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
-import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.apache.stanbol.enhancer.servicesapi.rdf.NamespaceEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

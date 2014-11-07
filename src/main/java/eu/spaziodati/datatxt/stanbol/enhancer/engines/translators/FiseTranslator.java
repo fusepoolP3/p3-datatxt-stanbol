@@ -1,8 +1,8 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.translators;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtResponse;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.Language;
 import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.core.MGraph;
@@ -15,7 +15,7 @@ import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtResponse.Annotation;
+import static eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse.Annotation;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.*;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.DCTERMS_LINGUISTIC_SYSTEM;
 

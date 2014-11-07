@@ -1,7 +1,7 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
 import eu.fusepool.p3.vocab.FAM;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.AnnotationConstants;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants;
 import junit.framework.Assert;
 import org.apache.clerezza.rdf.core.*;
 import org.apache.clerezza.rdf.jena.serializer.JenaSerializerProvider;
@@ -11,7 +11,7 @@ import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 import org.apache.stanbol.enhancer.contentitem.inmemory.InMemoryContentItemFactory;
 
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.*;
-import static eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.AnnotationConstants.*;
+import static eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants.*;
 
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class DatatxtEnhancementEngineTest {
+public class DatatxtNexEngineTest {
 
     private static final ContentItemFactory ciFactory = InMemoryContentItemFactory.getInstance();
 

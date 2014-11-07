@@ -1,6 +1,6 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.translators;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtResponse;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 

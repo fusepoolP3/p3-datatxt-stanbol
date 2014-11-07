@@ -1,8 +1,8 @@
-package eu.spaziodati.datatxt.stanbol.engine.enhancer.translators;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
 import eu.fusepool.p3.vocab.FAM;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.DatatxtNexEngine;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtResponse;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtNexEngine;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.*;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
@@ -11,7 +11,7 @@ import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 
 import java.util.Date;
 
-import static eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.AnnotationConstants.*;
+import static eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants.*;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.RDF_TYPE;
 

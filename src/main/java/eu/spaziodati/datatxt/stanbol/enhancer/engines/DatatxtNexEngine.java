@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.spaziodati.datatxt.stanbol.engine.enhancer;
+package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtClient;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.client.DatatxtException;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.FamTranslator;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.FiseTranslator;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.ITranslator;
-import eu.spaziodati.datatxt.stanbol.engine.enhancer.translators.TranslationSupport;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtClient;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtException;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FamTranslator;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FiseTranslator;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.ITranslator;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.TranslationSupport;
 import org.apache.felix.scr.annotations.*;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;
 import org.apache.stanbol.enhancer.servicesapi.*;
@@ -48,7 +48,7 @@ import java.util.Map;
  * @author Gaetano Prestia  <prestia@netseven.it>
  * @author Giuliano Mega    <mega@spaziodati.eu>
  *
- * @see eu.spaziodati.datatxt.stanbol.engine.enhancer.DatatxtProperties
+ * @see DatatxtProperties
  */
 @Component(immediate = true,
         metatype = true,
