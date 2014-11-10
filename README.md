@@ -36,9 +36,10 @@ relevant of which are:
   (`eu.spaziodati.datatxt.stanbol.enhancer.engines.app_key`): should
   contain your dataTXT application key and id.
 
-* **Confidence threshold**: a value between `0` and `1` which
-  specifies the confidence threshold above which annotations are
-  considered to be valid. Set a high threshold to obtain higher
-  precision (but fewer annotations), or a low threshold to obtain more
-  annotations, but with lower precision.
+* **Confidence threshold**
+  (`eu.spaziodati.datatxt.stanbol.enhancer.engines.min_confidence`): a
+  value between `0` and `1` which specifies the confidence threshold
+  above which annotations are considered to be valid. Set a high
+  threshold to obtain higher precision (but fewer annotations), or a
+  low threshold to obtain more annotations, but with lower precision.
 
