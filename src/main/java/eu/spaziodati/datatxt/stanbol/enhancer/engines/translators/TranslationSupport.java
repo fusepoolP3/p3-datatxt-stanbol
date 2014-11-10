@@ -3,17 +3,21 @@ package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.Language;
 import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.NonLiteral;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
 import org.apache.stanbol.enhancer.servicesapi.rdf.NamespaceEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.*;
 
@@ -34,9 +38,9 @@ public class TranslationSupport {
     /**
      * Creates an Entity and adds it to the {@link org.apache.stanbol.enhancer.servicesapi.ContentItem#getMetadata()}.
      */
-    public void addEntity(ContentItem ci, DatatxtResponse.Annotation a, String lang) {
+    public void addEntity(Pair<UriRef, MGraph> item, DatatxtResponse.Annotation a, String lang) {
 
-        MGraph g = ci.getMetadata();
+        MGraph g = item.getValue();
 
         // TODO: uri: gli extra_types non hanno uri! se ne crea una fittizia
         String _uri = a.uri != null ? a.uri : getExtraTypesDummyUri(a.title);
@@ -62,6 +66,15 @@ public class TranslationSupport {
             } else if (a.image.full != null) {
                 g.add(new TripleImpl(entity, FOAF_DEPICTION, new UriRef(a.image.full)));
             }
+        }
+    }
+
+    public String getLanguage(Pair<UriRef, MGraph> item) {
+        List<NonLiteral> langAnnotations = EnhancementEngineHelper.getLanguageAnnotations(item.getValue());
+        if(langAnnotations.isEmpty()){ //fallback
+            return EnhancementEngineHelper.getString(item.getValue(), item.getKey(), DC_LANGUAGE);
+        } else {
+            return EnhancementEngineHelper.getString(item.getValue(), langAnnotations.get(0), DC_LANGUAGE);
         }
     }
 

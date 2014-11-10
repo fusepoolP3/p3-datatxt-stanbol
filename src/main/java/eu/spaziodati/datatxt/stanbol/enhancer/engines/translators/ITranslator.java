@@ -1,6 +1,9 @@
 package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
+import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 
@@ -16,6 +19,6 @@ public interface ITranslator {
      * Translates a {@link DatatxtResponse} into RDF {@link org.apache.clerezza.rdf.core.Triple}s,
      * storing them into {@link ContentItem#getMetadata()}.
      */
-    void translate(ContentItem ci, EnhancementEngine engine, DatatxtResponse datatxtResponse);
+    void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, DatatxtResponse datatxtResponse);
 
 }

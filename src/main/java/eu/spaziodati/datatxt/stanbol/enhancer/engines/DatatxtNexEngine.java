@@ -22,6 +22,10 @@ import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FamTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FiseTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.ITranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.TranslationSupport;
+import org.apache.clerezza.rdf.core.MGraph;
+import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.felix.scr.annotations.*;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;
 import org.apache.stanbol.enhancer.servicesapi.*;
@@ -99,7 +103,7 @@ public class DatatxtNexEngine
             @PropertyOption(name = "FISE", value = DatatxtNexEngine.PROPERTY_OUTPUT_ONTOLOGY + ".option.fise"),
             @PropertyOption(name = "FAM", value = DatatxtNexEngine.PROPERTY_OUTPUT_ONTOLOGY + ".option.fam"),
     }, value = "FAM")
-    public static final String PROPERTY_OUTPUT_ONTOLOGY = "enhancer.engine.datatxtNex.outputontology";
+    public static final String PROPERTY_OUTPUT_ONTOLOGY = NAMESPACE + ".outputontology";
 
     private volatile NamespacePrefixService fPrefixService;
 
@@ -150,7 +154,8 @@ public class DatatxtNexEngine
         // as we're enhancing synchronously.
         String text = text(ci);
         try {
-            fTranslator.translate(ci, this, fClient.doRequest(text, EnhancementEngineHelper.getLanguage(ci)));
+            fTranslator.translate(new ImmutablePair<UriRef, MGraph>(ci.getUri(), ci.getMetadata()),
+                    this, fClient.doRequest(text, EnhancementEngineHelper.getLanguage(ci)));
         } catch (DatatxtException ex) {
             throw new EngineException(ex);
         }

@@ -5,6 +5,7 @@ import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtNexEngine;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.*;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
@@ -18,7 +19,7 @@ import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.RDF_TYPE;
 /**
  * {@link FamTranslator} writes annotations using the
  * <a href="https://github.com/fusepoolP3/overall-architecture/blob/master/wp3/fp-anno-model/fp-anno-model.md">
- *     FAM</a> ontology.
+ * FAM</a> ontology.
  *
  * @author Giuliano Mega    <mega@spaziodati.eu>
  */
@@ -37,27 +38,27 @@ public class FamTranslator implements ITranslator {
     }
 
     @Override
-    public void translate(ContentItem ci, EnhancementEngine engine, DatatxtResponse response) {
-        MGraph graph = ci.getMetadata();
+    public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, DatatxtResponse response) {
+        MGraph graph = item.getValue();
 
-        UriRef context = createContext(ci);
+        UriRef context = createContext(item);
 
         for (DatatxtResponse.Annotation rawAnnotation : response.annotations) {
             // Adds entities linked from this annotation.
-            fSupport.addEntity(ci, rawAnnotation, response.lang);
+            fSupport.addEntity(item, rawAnnotation, response.lang);
 
             // Creates FAM annotation.
-            UriRef selector = selector(ci, context, response.text, rawAnnotation);
-            UriRef body = body(ci, rawAnnotation, selector);
-            UriRef target = target(ci, body, selector);
-            annotation(ci, body, target);
+            UriRef selector = selector(item, context, response.text, rawAnnotation);
+            UriRef body = body(item, rawAnnotation, selector);
+            UriRef target = target(item, body, selector);
+            annotation(item, body, target);
         }
 
-        addLanguage(ci, response);
+        addLanguage(item, response);
     }
 
-    private UriRef body(ContentItem ci, DatatxtResponse.Annotation annotation, UriRef selector) {
-        MGraph graph = ci.getMetadata();
+    private UriRef body(Pair<UriRef, MGraph> item, DatatxtResponse.Annotation annotation, UriRef selector) {
+        MGraph graph = item.getValue();
 
         UriRef body = new UriRef(mint("urn:enhancement-"));
 
@@ -69,7 +70,7 @@ public class FamTranslator implements ITranslator {
 
         // FAM selector and source shortcuts.
         add(graph, body, FAM.selector, selector);
-        add(graph, body, FAM.extracted_from, ci.getUri());
+        add(graph, body, FAM.extracted_from, item.getKey());
 
         if (annotation.types != null) {
             for (String type : annotation.types) {
@@ -80,9 +81,10 @@ public class FamTranslator implements ITranslator {
         return body;
     }
 
-    private UriRef selector(ContentItem ci, UriRef contextUri, String text, DatatxtResponse.Annotation annotation) {
-        MGraph graph = ci.getMetadata();
-        UriRef selector = createRFC5147URI(ci.getUri(), annotation.start, annotation.end);
+    private UriRef selector(Pair<UriRef, MGraph> item, UriRef contextUri, String text,
+                            DatatxtResponse.Annotation annotation) {
+        MGraph graph = item.getValue();
+        UriRef selector = createRFC5147URI(item.getKey(), annotation.start, annotation.end);
 
         add(graph, selector, RDF_TYPE, NIF_STRING);
         add(graph, selector, RDF_TYPE, NIF_RFC5147STRING);
@@ -102,19 +104,19 @@ public class FamTranslator implements ITranslator {
         return selector;
     }
 
-    private UriRef createContext(ContentItem ci) {
-        MGraph graph = ci.getMetadata();
-        UriRef context = createRFC5147URI(ci.getUri(), 0, null);
+    private UriRef createContext(Pair<UriRef, MGraph> item) {
+        MGraph graph = item.getValue();
+        UriRef context = createRFC5147URI(item.getKey(), 0, null);
 
         add(graph, context, RDF_TYPE, NIF_CONTEXT);
         add(graph, context, RDF_TYPE, NIF_RFC5147STRING);
-        add(graph, context, NIF_SOURCE_URL, ci.getUri());
+        add(graph, context, NIF_SOURCE_URL, item.getKey());
 
         return context;
     }
 
-    private void addLanguage(ContentItem ci, DatatxtResponse response) {
-        String lang = EnhancementEngineHelper.getLanguage(ci);
+    private void addLanguage(Pair<UriRef, MGraph> item, DatatxtResponse response) {
+        String lang = fSupport.getLanguage(item);
         // If there's already a language, leave it alone.
         if (lang != null) {
             return;
@@ -125,13 +127,13 @@ public class FamTranslator implements ITranslator {
             return;
         }
 
-        MGraph graph = ci.getMetadata();
+        MGraph graph = item.getValue();
         UriRef languageAnno = new UriRef(mint("urn:enhancement-"));
 
         add(graph, languageAnno, RDF_TYPE, FAM.LanguageAnnotation);
         add(graph, languageAnno, DC_LANGUAGE, literal(response.lang));
         add(graph, languageAnno, FAM.confidence, literal(response.langConfidence));
-        add(graph, languageAnno, FAM.extracted_from, ci.getUri());
+        add(graph, languageAnno, FAM.extracted_from,  item.getKey());
     }
 
     private String head(String text, int offset, int length) {
@@ -142,17 +144,17 @@ public class FamTranslator implements ITranslator {
         return text.substring(Math.max(0, text.length() - SELECTION_HEAD_TAIL - offset), offset);
     }
 
-    private UriRef target(ContentItem ci, UriRef body, UriRef selector) {
-        MGraph graph = ci.getMetadata();
+    private UriRef target(Pair<UriRef, MGraph> item, UriRef body, UriRef selector) {
+        MGraph graph = item.getValue();
         UriRef target = new UriRef(body.getUnicodeString() + SPTARGET_URI_SUFFIX);
         add(graph, target, RDF_TYPE, OA_SPECIFIC_RESOURCE);
         add(graph, target, OA_HAS_SELECTOR, selector);
-        add(graph, target, OA_HAS_SOURCE, ci.getUri());
+        add(graph, target, OA_HAS_SOURCE, item.getKey());
         return target;
     }
 
-    private UriRef annotation(ContentItem ci, UriRef body, UriRef target) {
-        MGraph graph = ci.getMetadata();
+    private UriRef annotation(Pair<UriRef, MGraph> item, UriRef body, UriRef target) {
+        MGraph graph = item.getValue();
 
         UriRef enhancement = new UriRef(body.getUnicodeString() + ANNO_URI_SUFFIX);
         Date current = new Date();
@@ -179,9 +181,9 @@ public class FamTranslator implements ITranslator {
      * Creates an <a href="http://tools.ietf.org/html/rfc5147">RFC 5147</a>
      * compatible URI. In case start or end is <code>null</code> a URI selecting
      * the whole document will be returned.
-     *
+     * <p/>
      * Taken from the <a href="https://github.com/fusepoolP3/p3-stanbol-engine-fam">
-     *     P3 Fise2Fam engine</a>.
+     * P3 Fise2Fam engine</a>.
      *
      * @param base  the base URI
      * @param start the start position or <code>null</code> if the whole text is selected
