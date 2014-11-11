@@ -94,7 +94,7 @@ public class FamTranslator implements ITranslator {
         add(graph, selector, NIF_ANCHOR_OF, literal(annotation.spot));
 
         add(graph, selector, NIF_HEAD, literal(head(text, 0, SELECTION_HEAD_TAIL)));
-        add(graph, selector, NIF_TAIL, literal(tail(text, text.length() - 1, SELECTION_HEAD_TAIL)));
+        add(graph, selector, NIF_TAIL, literal(tail(text, text.length(), SELECTION_HEAD_TAIL)));
 
         add(graph, selector, NIF_BEFORE, literal(tail(text, annotation.start, SELECTION_PREFIX_SUFFIX)));
         add(graph, selector, NIF_AFTER, literal(head(text, annotation.end, SELECTION_PREFIX_SUFFIX)));
@@ -141,7 +141,7 @@ public class FamTranslator implements ITranslator {
     }
 
     private String tail(String text, int offset, int length) {
-        return text.substring(Math.max(0, text.length() - SELECTION_HEAD_TAIL - offset), offset);
+        return text.substring(Math.max(0, offset - length), offset);
     }
 
     private UriRef target(Pair<UriRef, MGraph> item, UriRef body, UriRef selector) {
