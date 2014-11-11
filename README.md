@@ -27,8 +27,11 @@ relevant of which are:
   allows the configuration of the ontology in which to produce the
   entity annotations. The currently supported values are:
 
-  * `FISE`: produces annotations in the [Stanbol FISE]() ontology;
-  * `FAM`: produces annotations in the [Fusepool Annotation Model]().
+  * `FISE`: produces annotations in the
+    [Stanbol FISE](http://stanbol.apache.org/docs/trunk/components/enhancer/enhancementstructure)
+    ontology;
+  * `FAM`: produces annotations in the
+    [Fusepool Annotation Model](https://github.com/fusepoolP3/overall-architecture/blob/master/wp3/fp-anno-model/fp-anno-model.md).
 
 * **Application ID**
   (`eu.spaziodati.datatxt.stanbol.enhancer.engines.app_id`) and
