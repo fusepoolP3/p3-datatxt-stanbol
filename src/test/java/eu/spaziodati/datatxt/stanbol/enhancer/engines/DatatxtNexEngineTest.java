@@ -4,6 +4,7 @@ import eu.fusepool.p3.vocab.FAM;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants;
 import junit.framework.Assert;
 import org.apache.clerezza.rdf.core.*;
+import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
 import org.apache.clerezza.rdf.jena.serializer.JenaSerializerProvider;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
@@ -43,23 +44,23 @@ public class DatatxtNexEngineTest {
 
         HashSet<UriRef> reference = new HashSet<>(TestUtils.ENTITIES);
 
+        // Check language annotation (just the language).
+        UriRef lang = (UriRef) get(graph.filter(null, RDF_TYPE, FAM.LanguageAnnotation), 1).getSubject();
+        PlainLiteral language = (PlainLiteral) get(graph.filter(lang, DC_LANGUAGE, null), 1).getObject();
+        Assert.assertEquals("en", language.getLexicalForm());
+
         int count = 0;
         while (annotations.hasNext()) {
             UriRef annotation = (UriRef) annotations.next().getSubject();
-            checkEntityAnnotation(graph, annotation, reference);
+            checkEntityAnnotation(graph, annotation, reference, language.getLexicalForm());
             count++;
         }
 
-        // Check language annotation (just the language).
-        UriRef lang = (UriRef) get(graph.filter(null, RDF_TYPE, FAM.LanguageAnnotation), 1).getSubject();
-
-        Assert.assertEquals(LiteralFactory.getInstance().createTypedLiteral("en"),
-                get(graph.filter(lang, DC_LANGUAGE, null), 1).getObject());
 
         Assert.assertEquals(TestUtils.ENTITIES.size(), count);
     }
 
-    private void checkEntityAnnotation(MGraph graph, UriRef anno, Set<UriRef> reference) {
+    private void checkEntityAnnotation(MGraph graph, UriRef anno, Set<UriRef> reference, String language) {
         // Should have a body and a target.
         UriRef body = (UriRef) get(graph.filter(anno, AnnotationConstants.OA_HAS_BODY, null), 1).getObject();
         UriRef target = (UriRef) get(graph.filter(anno, AnnotationConstants.OA_HAS_TARGET, null), 1).getObject();
@@ -77,7 +78,12 @@ public class DatatxtNexEngineTest {
         typeOf(graph, target).contains(FAM.LinkedEntity);
 
         UriRef mention = (UriRef) get(graph.filter(body, FAM.entity_reference, null), 1).getObject();
-        get(graph.filter(body, FAM.entity_label, null), 1);
+        Triple label = get(graph.filter(body, FAM.entity_label, null), 1);
+
+        // Label should be an RDF plain literal with the same language as the rest of the text.
+        Assert.assertTrue(label.getObject() instanceof PlainLiteral);
+        PlainLiteral literal = (PlainLiteral) label.getObject();
+        Assert.assertEquals(literal.getLanguage().toString(), language);
 
         Assert.assertTrue(reference.remove(mention));
     }

@@ -4,6 +4,7 @@ import eu.fusepool.p3.vocab.FAM;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtNexEngine;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
 import org.apache.clerezza.rdf.core.*;
+import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
 import org.apache.clerezza.rdf.core.impl.TripleImpl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
@@ -43,21 +44,23 @@ public class FamTranslator implements ITranslator {
 
         UriRef context = createContext(item);
 
+        Language language = addLanguage(item, response);
+
         for (DatatxtResponse.Annotation rawAnnotation : response.annotations) {
             // Adds entities linked from this annotation.
             fSupport.addEntity(item, rawAnnotation, response.lang);
 
             // Creates FAM annotation.
-            UriRef selector = selector(item, context, response.text, rawAnnotation);
-            UriRef body = body(item, rawAnnotation, selector);
+            UriRef selector = selector(item, context, response.text, rawAnnotation, language);
+            UriRef body = body(item, rawAnnotation, selector, language);
             UriRef target = target(item, body, selector);
             annotation(item, body, target);
         }
 
-        addLanguage(item, response);
+
     }
 
-    private UriRef body(Pair<UriRef, MGraph> item, DatatxtResponse.Annotation annotation, UriRef selector) {
+    private UriRef body(Pair<UriRef, MGraph> item, DatatxtResponse.Annotation annotation, UriRef selector, Language lang) {
         MGraph graph = item.getValue();
 
         UriRef body = new UriRef(mint("urn:enhancement-"));
@@ -65,7 +68,7 @@ public class FamTranslator implements ITranslator {
         add(graph, body, RDF_TYPE, FAM.EntityAnnotation);
 
         add(graph, body, FAM.entity_reference, new UriRef(annotation.uri));
-        add(graph, body, FAM.entity_label, literal(annotation.title));
+        add(graph, body, FAM.entity_label, literal(annotation.title, lang));
         add(graph, body, FAM.confidence, literal(annotation.confidence));
 
         // FAM selector and source shortcuts.
@@ -82,7 +85,7 @@ public class FamTranslator implements ITranslator {
     }
 
     private UriRef selector(Pair<UriRef, MGraph> item, UriRef contextUri, String text,
-                            DatatxtResponse.Annotation annotation) {
+                            DatatxtResponse.Annotation annotation, Language lang) {
         MGraph graph = item.getValue();
         UriRef selector = createRFC5147URI(item.getKey(), annotation.start, annotation.end);
 
@@ -91,13 +94,13 @@ public class FamTranslator implements ITranslator {
 
         add(graph, selector, NIF_BEGIN_INDEX, literal(annotation.start));
         add(graph, selector, NIF_END_INDEX, literal(annotation.end));
-        add(graph, selector, NIF_ANCHOR_OF, literal(annotation.spot));
+        add(graph, selector, NIF_ANCHOR_OF, literal(annotation.spot, lang));
 
-        add(graph, selector, NIF_HEAD, literal(head(text, 0, SELECTION_HEAD_TAIL)));
-        add(graph, selector, NIF_TAIL, literal(tail(text, text.length(), SELECTION_HEAD_TAIL)));
+        add(graph, selector, NIF_HEAD, literal(head(text, 0, SELECTION_HEAD_TAIL), lang));
+        add(graph, selector, NIF_TAIL, literal(tail(text, text.length(), SELECTION_HEAD_TAIL), lang));
 
-        add(graph, selector, NIF_BEFORE, literal(tail(text, annotation.start, SELECTION_PREFIX_SUFFIX)));
-        add(graph, selector, NIF_AFTER, literal(head(text, annotation.end, SELECTION_PREFIX_SUFFIX)));
+        add(graph, selector, NIF_BEFORE, literal(tail(text, annotation.start, SELECTION_PREFIX_SUFFIX), lang));
+        add(graph, selector, NIF_AFTER, literal(head(text, annotation.end, SELECTION_PREFIX_SUFFIX), lang));
 
         add(graph, selector, NIF_REFERENCE_CONTEXT, contextUri);
 
@@ -115,25 +118,28 @@ public class FamTranslator implements ITranslator {
         return context;
     }
 
-    private void addLanguage(Pair<UriRef, MGraph> item, DatatxtResponse response) {
+    private Language addLanguage(Pair<UriRef, MGraph> item, DatatxtResponse response) {
         String lang = fSupport.getLanguage(item);
         // If there's already a language, leave it alone.
         if (lang != null) {
-            return;
+            return new Language(lang);
         }
 
         // dataTXT couldn't guess the language either. :-(
         if (response.lang == null) {
-            return;
+            return null;
         }
 
         MGraph graph = item.getValue();
         UriRef languageAnno = new UriRef(mint("urn:enhancement-"));
 
         add(graph, languageAnno, RDF_TYPE, FAM.LanguageAnnotation);
-        add(graph, languageAnno, DC_LANGUAGE, literal(response.lang));
+        add(graph, languageAnno, DC_LANGUAGE, literal(response.lang, null));
         add(graph, languageAnno, FAM.confidence, literal(response.langConfidence));
         add(graph, languageAnno, FAM.extracted_from,  item.getKey());
+
+        // Is response.lang already in the adequate format?
+        return new Language(response.lang);
     }
 
     private String head(String text, int offset, int length) {
@@ -202,6 +208,10 @@ public class FamTranslator implements ITranslator {
 
     private Literal literal(Object value) {
         return fLFactory.createTypedLiteral(value);
+    }
+
+    private Literal literal(String value, Language language) {
+        return new PlainLiteralImpl(value, language);
     }
 
     private void add(MGraph graph, NonLiteral subject, UriRef predicate, Resource object) {
