@@ -16,7 +16,29 @@ _datatxtNex_ calls the dataTXT APIs to annotate your text. To use the
 APIs, you need to
 [register first](https://dandelion.eu/accounts/login/) and obtain a
 **application key** and an **application id**. It's free.
- 
+
+Building and Running
+====================
+
+Building datatxtNex requires Maven 3, and running it requires Apache
+Stanbol. Assuming a working installation is present, after downloading
+the sources, switch to the sources root and run:
+
+```sh
+mvn package -DskipTests
+```
+
+This will produce an OSGi bundle under:
+
+```sh
+./target/datatxt-stanbol-[version].jar
+```
+
+which can be directly deployed into Apache Stanbol through its
+configuration console. Deploying the JAR will trigger the creation of
+the datatxt-stanbol enhancement chain which is an example enhancement
+chain including datatxtNex.
+
 Configuration Parameters
 ========================
 
