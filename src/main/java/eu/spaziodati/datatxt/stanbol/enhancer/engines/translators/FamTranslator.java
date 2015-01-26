@@ -39,7 +39,7 @@ public class FamTranslator implements ITranslator {
     }
 
     @Override
-    public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, DatatxtResponse response) {
+    public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, String text, DatatxtResponse response) {
         MGraph graph = item.getValue();
 
         UriRef context = createContext(item);

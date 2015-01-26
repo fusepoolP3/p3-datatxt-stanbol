@@ -6,6 +6,8 @@ import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.easymock.EasyMock;
 import org.osgi.service.component.ComponentContext;
 
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtNexEngine.OutputOntology;
+
 import java.util.*;
 
 public class TestUtils {
@@ -27,11 +29,11 @@ public class TestUtils {
         add(new UriRef("http://en.wikipedia.org/wiki/Paris"));
     }};
 
-    public static ComponentContext mockComponentContext() throws Exception {
+    public static ComponentContext mockComponentContext(OutputOntology outputOntology) throws Exception {
         ComponentContext context = EasyMock.createMock(ComponentContext.class);
 
         EasyMock.expect(context.getProperties())
-                .andReturn(config())
+                .andReturn(config(outputOntology))
                 .anyTimes();
 
         EasyMock.replay(context);
@@ -52,6 +54,10 @@ public class TestUtils {
     }
 
     public static Dictionary<String, Object> config() throws Exception {
+        return config(null);
+    }
+    
+    public static Dictionary<String, Object> config(OutputOntology outputOntology) throws Exception {
         Dictionary<String, Object> config = new Hashtable<>();
 
         config.put(EnhancementEngine.PROPERTY_NAME, "datatxtAnnotate");
@@ -59,7 +65,10 @@ public class TestUtils {
 
         addProperty(config, ENV_TEST_APP_ID, DatatxtProperties.DATATXT_APP_ID);
         addProperty(config, ENV_TEST_APP_KEY, DatatxtProperties.DATATXT_APP_KEY);
-
+        if(outputOntology == null){
+            outputOntology = OutputOntology.FAM;
+        }
+        config.put(DatatxtNexEngine.PROPERTY_OUTPUT_ONTOLOGY, outputOntology.name());
         return config;
     }
 

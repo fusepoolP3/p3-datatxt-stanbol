@@ -1,26 +1,47 @@
 package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
 import eu.fusepool.p3.vocab.FAM;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.DatatxtNexEngine.OutputOntology;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants;
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.apache.clerezza.rdf.core.*;
 import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
+import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.clerezza.rdf.jena.serializer.JenaSerializerProvider;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
+import org.apache.stanbol.enhancer.servicesapi.rdf.Properties;
+import org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses;
+import org.apache.stanbol.enhancer.test.helper.EnhancementStructureHelper;
 import org.apache.stanbol.enhancer.contentitem.inmemory.InMemoryContentItemFactory;
 
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.*;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.TechnicalClasses.ENHANCER_ENTITYANNOTATION;
+import static org.apache.stanbol.enhancer.test.helper.EnhancementStructureHelper.validateAllTextAnnotations;
+import static org.apache.stanbol.enhancer.test.helper.EnhancementStructureHelper.validateEntityAnnotation;
 import static eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.AnnotationConstants.*;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class DatatxtNexEngineTest {
+    
+    private static final Logger log = LoggerFactory.getLogger(DatatxtNexEngineTest.class);
+    
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private static final ContentItemFactory ciFactory = InMemoryContentItemFactory.getInstance();
 
@@ -33,10 +54,12 @@ public class DatatxtNexEngineTest {
         DatatxtNexEngine engine = new DatatxtNexEngine();
 
         engine.bind(TestUtils.mockPrefixService());
-        engine.activate(TestUtils.mockComponentContext());
+        engine.activate(TestUtils.mockComponentContext(OutputOntology.FAM));
 
         ContentItem ci = ciFactory.createContentItem(new StringSource(TestUtils.DATA_TXT_DEMO_TEXT));
         engine.computeEnhancements(ci);
+        
+        debugEnhancementResults(ci);
 
         // Check entity annotations.
         MGraph graph = ci.getMetadata();
@@ -58,6 +81,58 @@ public class DatatxtNexEngineTest {
 
 
         Assert.assertEquals(TestUtils.ENTITIES.size(), count);
+    }
+    
+    @Test
+    public void testFISEEngine() throws Exception {
+        DatatxtNexEngine engine = new DatatxtNexEngine();
+
+        engine.bind(TestUtils.mockPrefixService());
+        engine.activate(TestUtils.mockComponentContext(OutputOntology.FISE));
+
+        ContentItem ci = ciFactory.createContentItem(new StringSource(TestUtils.DATA_TXT_DEMO_TEXT));
+        engine.computeEnhancements(ci);
+        
+        debugEnhancementResults(ci);
+
+        
+        MGraph metadata = ci.getMetadata();
+
+        Map<UriRef,Resource> expected = new HashMap<UriRef,Resource>();
+        expected.put(Properties.ENHANCER_EXTRACTED_FROM, ci.getUri());
+        expected.put(Properties.DC_CREATOR, lFactory.createTypedLiteral(DatatxtNexEngine.class.getName()));
+        validateAllTextAnnotations(metadata, TestUtils.DATA_TXT_DEMO_TEXT, expected);
+        
+        Set<UriRef> expectedEntities = new HashSet<UriRef>(TestUtils.ENTITIES);
+        
+        Iterator<Triple> it = metadata.filter(null, RDF_TYPE, ENHANCER_ENTITYANNOTATION);
+        while(it.hasNext()){
+            Triple t = it.next();
+            Assert.assertTrue(t.getSubject() instanceof UriRef);
+            validateEntityAnnotation(metadata, (UriRef)t.getSubject(), expected);
+            Iterator<Triple> refEntityIt = metadata.filter(t.getSubject(), ENHANCER_ENTITY_REFERENCE, null);
+            Assert.assertTrue(refEntityIt.hasNext());
+            Resource refEntity = refEntityIt.next().getObject();
+            Assert.assertTrue(refEntity instanceof UriRef);
+            Assert.assertFalse(refEntityIt.hasNext());
+            Assert.assertTrue(expectedEntities.remove(refEntity));
+        }
+        Assert.assertTrue(expectedEntities.isEmpty());
+        
+    }
+    
+    
+    /**
+     * Logs the enhancement results as {@link SupportedFormat#TURTLE} on
+     * DEBUG level.
+     * @param ci the processed contentItem
+     */
+    private static void debugEnhancementResults(ContentItem ci) {
+        if(log.isDebugEnabled()){
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            fSerializer.serialize(out, ci.getMetadata(), SupportedFormat.TURTLE);
+            log.debug("Enhancement Results:\n{}\n",new String(out.toByteArray(),UTF8));
+        }
     }
 
     private void checkEntityAnnotation(MGraph graph, UriRef anno, Set<UriRef> reference, String language) {

@@ -155,7 +155,7 @@ public class DatatxtNexEngine
         String text = text(ci);
         try {
             fTranslator.translate(new ImmutablePair<UriRef, MGraph>(ci.getUri(), ci.getMetadata()),
-                    this, fClient.doRequest(text, EnhancementEngineHelper.getLanguage(ci)));
+                    this, text, fClient.doRequest(text, EnhancementEngineHelper.getLanguage(ci)));
         } catch (DatatxtException ex) {
             throw new EngineException(ex);
         }

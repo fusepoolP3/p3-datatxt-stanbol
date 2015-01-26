@@ -2,7 +2,9 @@ package eu.spaziodati.datatxt.stanbol.enhancer.engines.translators;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtResponse;
+
 import org.apache.clerezza.rdf.core.Language;
 import org.apache.clerezza.rdf.core.LiteralFactory;
 import org.apache.clerezza.rdf.core.MGraph;
@@ -13,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementEngine;
 import org.apache.stanbol.enhancer.servicesapi.helper.EnhancementEngineHelper;
+import org.apache.stanbol.enhancer.servicesapi.rdf.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,15 +43,15 @@ public class FiseTranslator implements ITranslator {
         fSupport = support;
     }
 
-    public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, DatatxtResponse datatxtResponse) {
+    public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, String text, DatatxtResponse datatxtResponse) {
         LOG.info(String.format("DatatxtAnnotator: Enhance ContentItem with FISE Annotations: ContentItem=%s, " +
                 "DatatxtResponse=%s", (item != null ? item.getKey() : item), GSON.toJson(datatxtResponse)));
-
+        Language lang = datatxtResponse.lang != null ? new Language(datatxtResponse.lang) : null;
         if (item != null && datatxtResponse != null) {
             if (datatxtResponse.annotations != null) {
                 for (Annotation a : datatxtResponse.annotations) {
-                    UriRef textAnnotation = createTextAnnotation(item, engine, a, datatxtResponse.lang);
-                    UriRef entityAnnotation = createEntityAnnotation(item, engine, a, datatxtResponse.lang, textAnnotation);
+                    UriRef textAnnotation = createTextAnnotation(item, engine, a, text, lang);
+                    UriRef entityAnnotation = createEntityAnnotation(item, engine, a, lang, textAnnotation);
                     fSupport.addEntity(item, a, datatxtResponse.lang);
                 }
             }
@@ -56,17 +59,19 @@ public class FiseTranslator implements ITranslator {
         }
     }
 
-    public static UriRef createTextAnnotation(Pair<UriRef, MGraph> item, EnhancementEngine engine, Annotation a, String lang) {
+    public static UriRef createTextAnnotation(Pair<UriRef, MGraph> item, EnhancementEngine engine, Annotation a, String text, Language lang) {
         MGraph g = item.getValue();
         UriRef textAnnotation = EnhancementEngineHelper.createTextEnhancement(item.getValue(), engine, item.getKey());
         g.add(new TripleImpl(textAnnotation, ENHANCER_START, literalFactory.createTypedLiteral(a.start)));
         g.add(new TripleImpl(textAnnotation, ENHANCER_END, literalFactory.createTypedLiteral(a.end)));
-        g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTED_TEXT, new PlainLiteralImpl(a.spot)));
+        g.add(new TripleImpl(textAnnotation, ENHANCER_SELECTED_TEXT, new PlainLiteralImpl(a.spot, lang)));
+        g.add(new TripleImpl(textAnnotation, Properties.ENHANCER_SELECTION_CONTEXT, 
+                new PlainLiteralImpl(EnhancementEngineHelper.getSelectionContext(text, a.spot, a.start), lang)));
         return textAnnotation;
     }
 
     public UriRef createEntityAnnotation(Pair<UriRef, MGraph> item, EnhancementEngine engine, Annotation a,
-                                         String lang, UriRef textAnnotation) {
+                                         Language lang, UriRef textAnnotation) {
 
         MGraph g = item.getValue();
         UriRef entityAnnotation = EnhancementEngineHelper.createEntityEnhancement(item.getValue(), engine,
@@ -74,7 +79,7 @@ public class FiseTranslator implements ITranslator {
         // TODO: uri: gli extra_types non hanno uri! se ne crea una fittizia
         String _uri = a.uri != null ? a.uri : fSupport.getExtraTypesDummyUri(a.title);
         g.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_REFERENCE, new UriRef(_uri)));
-        g.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_LABEL, new PlainLiteralImpl(a.title, new Language(lang))));
+        g.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_LABEL, new PlainLiteralImpl(a.title, lang)));
         g.add(new TripleImpl(entityAnnotation, ENHANCER_CONFIDENCE, literalFactory.createTypedLiteral((double) a.confidence)));
         if (a.types != null) {
             for (String type : a.types) {

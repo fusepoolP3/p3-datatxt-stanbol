@@ -1,7 +1,7 @@
 package eu.spaziodati.datatxt.stanbol.enhancer.engines.client;
 
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.TestUtils;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.junit.Test;
 

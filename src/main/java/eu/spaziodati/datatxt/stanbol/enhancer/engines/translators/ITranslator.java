@@ -19,6 +19,6 @@ public interface ITranslator {
      * Translates a {@link DatatxtResponse} into RDF {@link org.apache.clerezza.rdf.core.Triple}s,
      * storing them into {@link ContentItem#getMetadata()}.
      */
-    void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, DatatxtResponse datatxtResponse);
+    void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, String text, DatatxtResponse datatxtResponse);
 
 }
