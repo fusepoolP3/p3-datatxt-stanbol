@@ -22,10 +22,10 @@ import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FamTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FiseTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.ITranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.TranslationSupport;
+
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.felix.scr.annotations.*;
 import org.apache.stanbol.commons.namespaceprefix.NamespacePrefixService;
 import org.apache.stanbol.enhancer.servicesapi.*;
@@ -100,9 +100,11 @@ public class DatatxtNexEngine
      * in {@link OutputOntology} are allowed, and are interpreted as {@link OutputOntology#valueOf(String)}.
      */
     @Property(options = {
-            @PropertyOption(name = "FISE", value = DatatxtNexEngine.PROPERTY_OUTPUT_ONTOLOGY + ".option.fise"),
-            @PropertyOption(name = "FAM", value = DatatxtNexEngine.PROPERTY_OUTPUT_ONTOLOGY + ".option.fam"),
-    }, value = "FAM")
+            @PropertyOption(name = "FISE", value = "FISE (Stanbol Enhancement Structure)"),
+            @PropertyOption(name = "FAM", value = "FAM (Fusepool Annotation Model)"),
+    }, value = "FAM", label="Ouput Ontology", description="This engines supports (1) FISE: "
+            + "Stanbol Enhancement Structure and (2) FAM: Fusepool Annotation Model as output "
+            + "format for annotations.")
     public static final String PROPERTY_OUTPUT_ONTOLOGY = NAMESPACE + ".outputontology";
 
     private volatile NamespacePrefixService fPrefixService;
@@ -111,7 +113,7 @@ public class DatatxtNexEngine
 
     private volatile DatatxtClient fClient;
 
-    public Map getServiceProperties() {
+    public Map<String,Object> getServiceProperties() {
         return Collections.unmodifiableMap(Collections.singletonMap(
                 ServiceProperties.ENHANCEMENT_ENGINE_ORDERING,
                 (Object) DEFAULT_ORDER));
@@ -121,6 +123,7 @@ public class DatatxtNexEngine
     @Activate
     protected void activate(ComponentContext ctx) throws ConfigurationException, IOException {
         super.activate(ctx);
+        @SuppressWarnings("unchecked")
         Dictionary<String, Object> properties = ctx.getProperties();
         fTranslator = outputOntology(ctx, properties);
         fClient = DatatxtClient.newClient(properties);

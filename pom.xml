@@ -43,14 +43,15 @@
                         <Import-Package>
                             org.apache.stanbol.enhancer.servicesapi*;version="[0.12.0,2)",
                             org.apache.stanbol.commons.namespaceprefix;version="[0.12.0,2)",
-                            org.apache.clerezza.rdf.core; provide:=true,
                             *
                         </Import-Package>
-                        <Export-Package>
+                        <!-- org.apache.clerezza.rdf.core; provide:=true, -->
+                        <Private-Package>
                             eu.spaziodati.datatxt.stanbol.enhancer.engines*;version=${project.version}
-                        </Export-Package>
+                        </Private-Package>
 
-                        <Embed-Dependency>*;scope=!(provided|test)</Embed-Dependency>
+                        <!-- Embed-Dependency>*;scope=!(provided|test)</Embed-Dependency -->
+                        <Embed-Dependency>gson, vocab</Embed-Dependency>
                         <!-- Enable this for including your enhancement chain configuration -->
                         <Install-Path>config</Install-Path>
                     </instructions>
@@ -138,14 +139,14 @@
             <version>3.1</version>
         </dependency>
 
+        <!-- Things that don't. -->
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Things that don't. -->
 
         <dependency>
             <groupId>org.apache.stanbol</groupId>
