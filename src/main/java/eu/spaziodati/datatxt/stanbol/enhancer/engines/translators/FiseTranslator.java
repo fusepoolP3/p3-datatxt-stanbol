@@ -44,8 +44,11 @@ public class FiseTranslator implements ITranslator {
     }
 
     public void translate(Pair<UriRef, MGraph> item, EnhancementEngine engine, String text, DatatxtResponse datatxtResponse) {
-        LOG.info(String.format("DatatxtAnnotator: Enhance ContentItem with FISE Annotations: ContentItem=%s, " +
-                "DatatxtResponse=%s", (item != null ? item.getKey() : item), GSON.toJson(datatxtResponse)));
+        if(LOG.isDebugEnabled()){
+            UriRef id = item != null ? item.getKey() : null;
+            LOG.debug(String.format("DatatxtAnnotator: Enhance ContentItem with FISE Annotations: ContentItem=%s, " +
+                "DatatxtResponse=%s", id, GSON.toJson(datatxtResponse)));
+        }
         Language lang = datatxtResponse.lang != null ? new Language(datatxtResponse.lang) : null;
         if (item != null && datatxtResponse != null) {
             if (datatxtResponse.annotations != null) {
