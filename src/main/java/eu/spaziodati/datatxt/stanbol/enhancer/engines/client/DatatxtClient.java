@@ -116,8 +116,16 @@ public class DatatxtClient implements DatatxtProperties {
             throw new DatatxtException("Cannot prepare query data for the HttpRequest", e);
         }
     }
-
-    private DatatxtResponse performRequest(String contentText, String contentLang) throws DatatxtException {
+    /**
+     * 
+     * @param contentText
+     * @param contentLang
+     * @return
+     * @throws UnmanagedLanguageException if the language of the parsed content is not
+     * supported by DataTXT
+     * @throws DatatxtException on any other error while calling the DataTXT service
+     */
+    private DatatxtResponse performRequest(String contentText, String contentLang) throws UnmanagedLanguageException, DatatxtException {
 
         fLogger.info(String.format("DatatxtAnnotator POSTing remote service: endpoint=%s", fNexUrl));
 
@@ -183,7 +191,7 @@ public class DatatxtClient implements DatatxtProperties {
             if (response.error && response.code.contains(".unmanagedLanguage")) {
                 Matcher matcher = Pattern.compile("\\[(.*?)\\]").matcher(response.message);
                 String unmanagedLanguage = matcher.find() ? matcher.group(1) : null;
-                throw new DatatxtException(String.format("Unmanaged language'%s'", unmanagedLanguage), null);
+                throw new UnmanagedLanguageException(unmanagedLanguage);
             }
 
             throw new DatatxtException("Invalid Response: Code=" + responseCode + ", Response=" + responseContent + ", Request=" + query, null);

@@ -18,6 +18,7 @@ package eu.spaziodati.datatxt.stanbol.enhancer.engines;
 
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtClient;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.DatatxtException;
+import eu.spaziodati.datatxt.stanbol.enhancer.engines.client.UnmanagedLanguageException;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FamTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.FiseTranslator;
 import eu.spaziodati.datatxt.stanbol.enhancer.engines.translators.ITranslator;
@@ -159,6 +160,9 @@ public class DatatxtNexEngine
         try {
             fTranslator.translate(new ImmutablePair<UriRef, MGraph>(ci.getUri(), ci.getMetadata()),
                     this, text, fClient.doRequest(text, EnhancementEngineHelper.getLanguage(ci)));
+        } catch (UnmanagedLanguageException ex){
+            fLogger.warn("Unable to process ContentItem {} because Language {} is not supported by DataTXT",
+                    ci, ex.getLanguage());
         } catch (DatatxtException ex) {
             throw new EngineException(ex);
         }
