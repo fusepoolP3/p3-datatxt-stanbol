@@ -1,4 +1,4 @@
-dataTXT-NEX Stanbol Enhancement Engine (datatxtNex)
+dataTXT-NEX Stanbol Enhancement Engine (datatxtNex) [![Build Status](https://api.travis-ci.org/fusepoolP3/p3-datatxt-stanbol.svg)](https://travis-ci.org/fusepoolP3/p3-datatxt-stanbol)
 ===================================================
 
 _datatxtNex_ is an
