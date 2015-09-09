@@ -4,7 +4,7 @@ dataTXT-NEX Stanbol Enhancement Engine (datatxtNex) [![Build Status](https://api
 _datatxtNex_ is an
 [Enhancement Engine](https://stanbol.apache.org/docs/trunk/components/)
 for [Apache Stanbol](https://stanbol.apache.org/) which allows you to
-use [dataTXT](https://dandelion.eu/) (now Dandelion API) to annotate your
+use [dataTXT](https://dandelion.eu/semantic-text/entity-extraction-demo/) (now Dandelion API) to annotate your
 text from Apache Stanbol.
 
 It supports both Stanbol FISE and the Fusepool Annotation Model (FAM)
